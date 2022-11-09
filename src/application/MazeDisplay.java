@@ -76,6 +76,8 @@ public class MazeDisplay extends Application {
 
 	// The maze to search
 	private Maze maze;
+	
+	private MazeController myMazeController;
 
 
 	// Start of JavaFX Application
@@ -83,9 +85,10 @@ public class MazeDisplay extends Application {
 		// Initializing logic state
 		int numRows = NUM_ROWS;
 		int numColumns = NUM_COLUMNS;
-		start = new Point(1,1);
-		goal = new Point(numRows-2, numColumns-2);
-		maze = new Maze(numRows, numColumns);
+		myMazeController = new MazeController(numRows, numColumns, this);
+		//start = new Point(1,1);
+		//goal = new Point(numRows-2, numColumns-2);
+		//maze = new Maze(numRows, numColumns);
 
 		
 		// Initializing the gui
@@ -141,7 +144,7 @@ public class MazeDisplay extends Application {
 
 		Button stepButton = new Button("Step");
 		stepButton.setOnAction(value ->  {
-			this.doOneStep(MILLISECOND_DELAY);
+			myMazeController.doOneStep(MILLISECOND_DELAY);
 		});
 		controls.getChildren().add(stepButton);
 		return controls;
@@ -154,31 +157,31 @@ public class MazeDisplay extends Application {
 
 		Button dfsButton = new Button("Depth-First Search");
 		dfsButton.setOnAction(value ->  {
-			startSearch("DFS");
+			myMazeController.startSearch("DFS");
 		});
 		searches.getChildren().add(dfsButton);
 
 		Button bfsButton = new Button("Breadth-First Search");
 		bfsButton.setOnAction(value ->  {
-			startSearch("BFS");
+			myMazeController.startSearch("BFS");
 		});
 		searches.getChildren().add(bfsButton);
 
 		Button greedyButton = new Button("Greedy");
 		greedyButton.setOnAction(value ->  {
-			startSearch("Greedy");
+			myMazeController.startSearch("Greedy");
 		});
 		searches.getChildren().add(greedyButton);
 
 		Button randButton = new Button("Random Walk");
 		randButton.setOnAction(value ->  {
-			startSearch("RandomWalk");
+			myMazeController.startSearch("RandomWalk");
 		});
 		searches.getChildren().add(randButton);
 
 		Button magicButton = new Button("Magic!");
 		magicButton.setOnAction(value ->  {
-			startSearch("Magic");
+			myMazeController.startSearch("Magic");
 		});
 		searches.getChildren().add(magicButton);
 		return searches;
@@ -187,6 +190,7 @@ public class MazeDisplay extends Application {
 	public Point getMazeDimensions() {
 		return new Point(NUM_ROWS, NUM_COLUMNS);
 	}
+	
 
 	/*
 	 * Setup the maze part for drawing. In particular,
@@ -198,7 +202,7 @@ public class MazeDisplay extends Application {
 		for(int i = 0; i< NUM_ROWS; i++){
 			for(int j =0; j < NUM_COLUMNS; j++){
 				Rectangle rect = new Rectangle(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-				rect.setFill(color[getCellState(new Point(i,j))]);
+				rect.setFill(color[myMazeController.getCellState(new Point(i,j))]);
 				mirrorMaze[i][j] = rect;
 				drawing.getChildren().add(rect);
 			}	
@@ -211,7 +215,7 @@ public class MazeDisplay extends Application {
 	 * When this happens, we should also stop the search.
 	 */
 	public void newMaze() {
-		maze.createMaze(maze.getNumRows(),maze.getNumCols());
+		myMazeController.getMaze().createMaze(myMazeController.getMaze().getNumRows(),myMazeController.getMaze().getNumCols());
 		search = "";
 		redraw();
 	}
@@ -245,7 +249,7 @@ public class MazeDisplay extends Application {
 	public void redraw(){
 		for(int i = 0; i< mirrorMaze.length; i++){
 			for(int j =0; j < mirrorMaze[i].length; j++){
-				mirrorMaze[i][j].setFill(color[getCellState(new Point(i,j))]);
+				mirrorMaze[i][j].setFill(color[myMazeController.getCellState(new Point(i,j))]);
 			}
 		}
 	}
@@ -255,7 +259,7 @@ public class MazeDisplay extends Application {
 	 */
 	public void step(double elapsedTime){
 		if(!paused) {
-			doOneStep(elapsedTime);
+			myMazeController.doOneStep(elapsedTime);
 		}
 	}
 
@@ -284,10 +288,14 @@ public class MazeDisplay extends Application {
 		rand = new RandomWalk(maze, start, goal);
 		magic = new Magic(maze, start, goal);
 	}
+	
+	public Rectangle[][] getMirrorMaze(){
+		return mirrorMaze;
+	}
 
 
 	public int getCellState(Point position) {
-		return maze.get(position);
+		return myMazeController.getMaze().get(position);
 	}
 
 	public static void main(String[] args) {
