@@ -7,6 +7,7 @@ import searches.Greedy;
 import searches.Magic;
 import searches.RandomWalk;
 import searches.SearchAlgorithm;
+import searches.SearchFactory;
 
 public class MazeController {
 	private Maze maze;
@@ -24,6 +25,9 @@ public class MazeController {
 	//new Search Algorithm type
 	private SearchAlgorithm search;
 	
+	//SearchFactory 
+	private SearchFactory myFactory;
+	
 	
 	
 	public MazeController(int numRows, int numColumns, MazeDisplay display) {
@@ -31,6 +35,7 @@ public class MazeController {
 		start = new Point(1,1);
 		goal = new Point(numRows-2, numColumns-2);
 		maze = new Maze(numRows, numColumns);
+		myFactory = new SearchFactory();
 	}
 
 
@@ -71,28 +76,7 @@ public class MazeController {
 	}
 	
 	public void startSearch(String searchType) {
-		maze.reColorMaze();
-		//search = searchType;
-		
-		// Restart the search.  Since I don't know 
-		// which one, I'll restart all of them.
-		if(searchType.equals("BFS")) {
-		search = new BFS(maze, start, goal);
-		// start in upper left and end in lower right corner
-		}
-		if(searchType.equals("DFS")) {
-		search = new DFS(maze, start, goal);
-		}
-		if(searchType.equals("Greedy")) {
-			search = new Greedy(maze, start, goal);
-		}
-		if(searchType.equals("RandomWalk")) {
-			search = new RandomWalk(maze, start, goal);
-		}
-		if(searchType.equals("Magic")) {
-			search = new Magic(maze, start, goal);
-		}
-		
+		search = myFactory.makeSearch(searchType, maze, start, goal);
 	}
 	
 	
