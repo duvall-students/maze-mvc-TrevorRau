@@ -6,19 +6,23 @@ import searches.DFS;
 import searches.Greedy;
 import searches.Magic;
 import searches.RandomWalk;
+import searches.SearchAlgorithm;
 
 public class MazeController {
 	private Maze maze;
 	private Point start;
 	private Point goal;
-	private Greedy greedy;				
-	private BFS bfs;
-	private DFS dfs;
-	private RandomWalk rand;
+    private Greedy greedy;				
+	//private BFS bfs;
+	//private DFS dfs;
+	//private RandomWalk rand;
 	private Magic magic;
 	private boolean paused = false;	
-	private String search = "";
+	//private String search = "";
 	private MazeDisplay mazeDisplay;
+	
+	//new Search Algorithm type
+	private SearchAlgorithm search;
 	
 	
 	
@@ -50,26 +54,45 @@ public class MazeController {
 	 * Does a step in the search regardless of pause status
 	 */
 	public void doOneStep(double elapsedTime){
+		/*
 		if(search.equals("DFS")) dfs.step();
 		else if (search.equals("BFS")) bfs.step();
 		else if (search.equals("Greedy")) greedy.step();
 		else if (search.equals("RandomWalk")) rand.step();
 		else if (search.equals("Magic")) magic.step();
-		mazeDisplay.redraw();
+		*/
+		
+		if(search != null) {
+			search.step();
+			mazeDisplay.redraw();
+		}
+		
+		
 	}
 	
 	public void startSearch(String searchType) {
 		maze.reColorMaze();
-		search = searchType;
+		//search = searchType;
 		
 		// Restart the search.  Since I don't know 
 		// which one, I'll restart all of them.
+		if(searchType.equals("BFS")) {
+		search = new BFS(maze, start, goal);
+		// start in upper left and end in lower right corner
+		}
+		if(searchType.equals("DFS")) {
+		search = new DFS(maze, start, goal);
+		}
+		if(searchType.equals("Greedy")) {
+			search = new Greedy(maze, start, goal);
+		}
+		if(searchType.equals("RandomWalk")) {
+			search = new RandomWalk(maze, start, goal);
+		}
+		if(searchType.equals("Magic")) {
+			search = new Magic(maze, start, goal);
+		}
 		
-		bfs = new BFS(maze, start, goal);	// start in upper left and end in lower right corner
-		dfs = new DFS(maze, start, goal);
-		greedy = new Greedy(maze, start, goal);
-		rand = new RandomWalk(maze, start, goal);
-		magic = new Magic(maze, start, goal);
 	}
 	
 	

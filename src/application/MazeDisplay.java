@@ -266,6 +266,8 @@ public class MazeDisplay extends Application {
 	/*
 	 * Does a step in the search regardless of pause status
 	 */
+	
+	/*
 	public void doOneStep(double elapsedTime){
 		if(search.equals("DFS")) dfs.step();
 		else if (search.equals("BFS")) bfs.step();
@@ -274,6 +276,7 @@ public class MazeDisplay extends Application {
 		else if (search.equals("Magic")) magic.step();
 		redraw();
 	}
+	*/
 	
 	public void startSearch(String searchType) {
 		maze.reColorMaze();

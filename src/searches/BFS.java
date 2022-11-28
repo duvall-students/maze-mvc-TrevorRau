@@ -10,24 +10,16 @@ import java.util.Queue;
 
 import application.Maze;
 
-public class BFS{	
+public class BFS extends SearchAlgorithm{	
 
 	// Keeps up with the child-parent trail so we can recreate the chosen path
-	HashMap<Point,Point> childParent;
+	protected HashMap<Point,Point> childParent;
 
-	private Maze maze;					// The maze being solved
-	private Point goal;					// The goal Point - will let us know when search is successful
-	private Collection<Point> data;		// Data structure used to keep "fringe" points
-	private boolean searchOver = false;	// Is search done?
-	private boolean searchResult = false;	// Was it successful?
-	private Point current;				// Current point being explored
+
 
 
 	public BFS(Maze mazeBlocks, Point startPoint, Point goalPoint){
-		maze = mazeBlocks;
-		goal = goalPoint;
-		current = startPoint;
-		maze.markPath(current);
+		super(mazeBlocks, startPoint, goalPoint);
 		data = new LinkedList<>();
 		data.add(startPoint);
 		childParent = new HashMap<>();
@@ -36,6 +28,7 @@ public class BFS{
 	/*
 	 * Algorithm for Breadth-First Search
 	 */
+	/*
 	public boolean step(){
 		// Don't keep computing after goal is reached or determined impossible.
 		if(searchOver){
@@ -62,7 +55,8 @@ public class BFS{
 		checkSearchOver();
 		return searchResult;	
 	}
-
+	*/
+	
 	/*
 	 * This method defines which "neighbors" or next points can be reached in the maze from
 	 * the current one.  
@@ -93,7 +87,8 @@ public class BFS{
 	 * 
 	 * It chooses the first point it finds that is empty.
 	 */
-	private Point chooseNeighbor(Collection<Point> neighbors){
+	@Override
+	protected Point chooseNeighbor(Collection<Point> neighbors){
 		for(Point p: neighbors){
 			if(maze.get(p)==Maze.EMPTY){
 				return p;
@@ -106,7 +101,8 @@ public class BFS{
 	 * In addition to putting the new node on the data structure, 
 	 * we need to remember who the parent is.
 	 */
-	private void recordLink(Point next){	
+	@Override
+	protected void recordLink(Point next){	
 		Queue<Point> queue = (Queue<Point>) data;
 		queue.add(next);
 		childParent.put(next,current);
@@ -115,33 +111,30 @@ public class BFS{
 	/*
 	 * The new node is the one next in the queue
 	 */
-	private void resetCurrent(){
+	@Override
+	protected void resetCurrent(){
 		Queue<Point> queue = (Queue<Point>) data;
 		current = queue.peek();
 	}
-
-
-	/*
-	 * Search is over and unsuccessful if there are no more fringe points to consider.
-	 * Search is over and successful if the current point is the same as the goal.
-	 */
-	private void checkSearchOver(){
-		if(data!= null && data.isEmpty()) {
-			searchOver = true;
-			searchResult = false;
-		}
-		if(isGoal(current)){
-			searchOver = true;
-			searchResult = true;
-		}
+	
+	@Override
+	protected void visitPoint() {
+		maze.markVisited(current);
+		Queue<Point> queue = (Queue<Point>) data;
+		queue.remove();
 	}
+	
+	@Override
+	protected boolean endSearch() {
+		colorPath();
+		return searchResult;
+	}
+
+
 
 	/*
 	 * Tells me when the search is over.
 	 */
-	private boolean isGoal(Point square){
-		return square!= null && square.equals(goal);
-	}
 
 
 	/*
